@@ -1,0 +1,1 @@
+During the process of procuring the AI-guided decision system, it was extensively tested, and it was found to correctly assess threats with AI_ACCURACY_RANGE accuracy

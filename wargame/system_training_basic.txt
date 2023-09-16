@@ -1,0 +1,3 @@
+* The system has undergone basic training and safety evaluation in modeling/simulation environment
+    * All crew have received baseline/computer-based training on the system
+    * Portion of the crew has hands-on training on the system

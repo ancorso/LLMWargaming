@@ -1,0 +1,15 @@
+Select Your Response Actions (select all that apply, respond with the letters, not the text):
+(a) Military Action 
+    (1) Preserve Status Quo/Deter
+    (2) Invade/Attack
+    (3) Invade/Attack
+(b) Activate Civilian Reserve/Draft
+(c) Surge Domestic Defense Production
+(d) Diplomacy
+(e) Economic Punishment
+(f) Economic Incentives
+(g) Clandestine/Special Operations
+(h) Information Operations
+(i) Conduct Foreign Intelligence
+(j) Conduct Domestic Intelligence
+(k) Cyber Operations

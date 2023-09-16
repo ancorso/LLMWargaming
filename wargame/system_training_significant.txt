@@ -1,0 +1,2 @@
+* The system has also undergone significant training and safety evaluation, including evaluation in high-stress environments very similar to current conditions
+    * Crew is well-trained on the system

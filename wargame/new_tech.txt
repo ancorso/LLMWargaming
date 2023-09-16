@@ -1,0 +1,17 @@
+New Technology:
+
+* A special capability is now operationally deployed in the USINDOPACOM theater
+    * The system has been vetted through all test and evaluation requirements and is now considered IOC but has not been used in a crisis before.
+* It is an AI-enabled self-defense system that automates and networks all ship-based defense capabilities of the CSG to prioritize firing on targets, differentiate friend vs. foe, and optimize engagements.
+    * Decreases maintenance and manpower requirements
+    * Optimizes use of force per engagement for ROE and maximizes munitions stores
+    * Can operate fully autonomously or with human-in-the-loop for final use of force decisions
+        * When the AI is operating fully autonomously, combat effectiveness is improved by 25-30% due to improved rate of engagement
+* The commander of the 5th CSG has requested authority to engage the AI-enabled defense system and asked for revised Rules of Engagement for its employment
+* Using this special capability requires Presidential authorization. The President has asked for a recommendation from the Deputies Committee, establishing the following priorities:
+    1. Protect the lives of U.S. service members
+    2. Minimize damage to Reagan CSG vessels
+    3. Avoid escalating crisis with China
+* Your recommendation to the President should include
+both decisions on the employment and on the desired
+end state for the current crisis.

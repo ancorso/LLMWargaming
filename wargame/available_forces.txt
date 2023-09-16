@@ -1,0 +1,76 @@
+Available Forces:
+
+----------------------------------
+Available U.S. Forces (In Theater)
+----------------------------------
+
+Okinawa, Japan:
+III Marine Corp
+* Expeditionary Force
+    * 3rd Marine Division
+    * 1st Marine Aircraft Wing
+    * 3rd Marine Expeditionary Brigade
+    * 31st Marine Expeditionary Unit
+* 18th Wing (Air Force)
+    * 44th Fighter Squadron
+    * 67th Fighter Squadron
+
+Misawa, Japan:
+* 35th Wing (Air Force)
+    * 13th Fighter Squadron
+    * 14th Fighter Squadron
+
+Yokosuka, Japan:
+* Ready for deployment
+    * SAG 2
+* At port (not deployable)
+    * 2 Destroyers
+
+
+Other Joint Forces not indicated:
+* Mine Countermeasure Squadron 7 and Amphibious
+Squadron 11 based out of Sasebo, Japan
+* Logistics and support vessels
+
+“Available U.S. Forces” indicate taskable forces. Joint
+Forces assigned to U.S. Forces Korea (USFK) are
+unavailable. U.S. intelligence cannot confirm what
+PLA forces might be presently committed but has high
+confidence that the Eastern Theater Command has
+operational command.
+
+----------------------------------
+Eastern Theater Command Forces
+----------------------------------
+
+PLA Ground Force (PLAGF)
+* 71st Army Group
+* 72nd Army Group
+* 73rd Army Group
+
+Each Army Groups Contains:
+    * 1 Heavy Brigade
+    * 2 Amphibious Brigades
+    * 1 Medium Brigade
+    * 1 Light Brigade
+
+PLA Navy (PLAN)
+The number of ships ready for deployment unknown
+    * 6 Destroyers
+    * 12 Frigates
+    * 10 Corvettes
+
+PLA Air Force (PLAAF)
+    * 9 Fighter Brigades
+    * 3 Bomber Regiments
+
+PLA Rocket Force (PLARF)
+    * 8 Brigades
+
+Other forces not indicated:
+* Logistics and support vessels
+* Amphibious assault vessels and other landing craft
+* This count does not include assets that might be
+leveraged for operational effect, including:
+    * Maritime militia
+    * China Coast Guard
