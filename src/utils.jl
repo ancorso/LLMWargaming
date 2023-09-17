@@ -1,16 +1,20 @@
-# using OpenAI
-# secret_key = "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"
-# model = "gpt-3.5-turbo-16k"
-# # rate_limit = Chat	200 RPD	3 RPM	40,000 TPM
+using OpenAI
 
-# prompt =  "Say \"this is a twest\""
+struct ChatSetup
+    secret_key::String
+    model::String
+end
 
-# r = create_chat(
-#     secret_key, 
-#     model,
-#     [Dict("role" => "user", "content"=> prompt)]
-#   )
-# println(r.response[:choices][begin][:message][:content])
+function chat!(setup, chat_hist, prompt)
+    push!(chat_hist, Dict("role" => "user", "content"=> prompt))
+    r = create_chat(
+        setup.secret_key, 
+        setup.model,
+        chat_hist
+      )
+    message = r.response[:choices][1][:message]
+    push!(chat_hist, Dict("role" => message[:role], "content"=> message[:content]))
+end
 
 function readfile(dir, filename)
     s = ""
