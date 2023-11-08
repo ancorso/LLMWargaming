@@ -26,6 +26,8 @@ function check_attribute(input, options, label="att")
     if attribute == ""
         @warn "Unknown $(label) for row $row: $(input)"
     end
+
+    return attribute
 end
 
 function create_player_data()
@@ -65,34 +67,34 @@ function create_player_data()
         given_back = split(survey[row, "Q23"], ",")
         affil = 0
         if "Government" in given_back
-            government_affiliation = 1
+            government_affiliation = true
             affil += 1
         else
-            government_affiliation = 0
+            government_affiliation = false
         end
         if "Academic" in given_back
-            academic_affiliation = 1
+            academic_affiliation = true
             affil += 1
         else
-            academic_affiliation = 0
+            academic_affiliation = false
         end
         if "Military" in given_back
-            military_affiliation = 1
+            military_affiliation = true
             affil += 1
         else
-            military_affiliation = 0
+            military_affiliation = false
         end
         if "Private Industry" in given_back
-            private_industry_affiliation = 1
+            private_industry_affiliation = true
             affil += 1
         else
-            private_industry_affiliation = 0
+            private_industry_affiliation = false
         end
         if "Non-Governmental Organization" in given_back
-            non_governmental_organization_affiliation = 1
+            non_governmental_organization_affiliation = true
             affil += 1
         else
-            non_governmental_organization_affiliation = 0
+            non_governmental_organization_affiliation = false
         end
         other_affiliation = ""
         if "Other" in given_back && affil <= 0
