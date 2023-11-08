@@ -193,7 +193,7 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     # Fill the initial results with game config and player config
     results = [game.dir, game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status)]
     for i in 1:6
-        if i < length(team)
+        if i <= length(team)
             push!(results, player_description(team[i]))
         else
             push!(results, "N/A")
