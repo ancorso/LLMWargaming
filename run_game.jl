@@ -1,6 +1,7 @@
 include("src/game.jl")
 using DataFrames
 using CSV
+using Serialization
 
 # Prepare the connection to the GPT model
 secret_key = "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"
@@ -10,6 +11,7 @@ chat_setup = ChatSetup(secret_key, model)
 # Setup the results dataframe and game dir
 wargame_dir = "wargame/"
 res = results_df(USPRCCrisisSimulation)
+boostrap_players = true
 
 # Generate Treatments
 treatments = []
@@ -22,7 +24,12 @@ for AI_accuracy in ["70-85%", "95-99%"]
 end
 
 # Generate one team (for now)
+if boostrap_players
+    loaded_player_data = deserialize("wargame/player_data.jls")
+    teams = [[rand(loaded_player_data) for i in 1:6] for i=1:10]
+else
 teams = [[Player() for i in 1:6] for i=1:10]
+end
 
 # # Print a sample:
 # print_prompts(treatments[1], team)
