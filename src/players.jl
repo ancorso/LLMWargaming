@@ -10,11 +10,11 @@ function gender_options()
 end
 
 function experience_options()
-    return ["Student", "Entry level professional (up to 5 years experince)", "Mid-level professional (5-15 years experience)", "Senior professional (15+ years experience)"]
+    return ["Student", "Entry level professional (up to 5 years experience)", "Mid-level professional (5-15 years experience)", "Senior professional (15+ years experience)"]
 end
 
 function AI_familiarity_options()
-    return ["No familiarity", "Routine understanding of concepts behind AI", "AI policy expert", "AI technical expert", "AI policy and technical expert"]
+    return ["No familiarity", "Routine understanding of concepts behind artificial intelligence", "Artificial intelligence policy expert", "Artificial intelligence technical expert", "Artificial intelligence policy and technical expert"]
 end
 
 function China_military_familiarity_options()
