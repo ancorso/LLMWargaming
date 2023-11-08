@@ -114,6 +114,18 @@ function move_1_2_options_desc()
         ]
 end
 
+function move_1_2_options_shortdesc()
+    return [
+        "(a) Fire at Chinese vessels",
+        "(b) Hold fire unless fired upon",
+        "(c) Hold fire w/o Prez approval",
+        "(d) Auto-fire",
+        "(e) Auto-target, manual-fire",
+        "(f) Full human",
+        "(g) Hold fire at all costs"
+        ]
+end
+
 function move_2_2_options()
     [["(a)", "(a1)", "(a2)", "(a3)"], ["(1)", "(a1)"], ["(2)", "(a2)"], ["(3)", "(a3)"], "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)"]
 end
@@ -137,7 +149,47 @@ function move_2_2_options_desc()
     ]
 end
 
-function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup)
+function print_prompts(game::USPRCCrisisSimulation, team::Vector{Player})
+    println(game_setup_prompt(game, team))
+    println("==========================================")
+
+    # Move 1 Question 1
+    println(move_1_1_prompt(game))
+    println("==========================================")
+
+
+    # Move 1 Question 2
+    println(move_1_2_prompt(game))
+    println("==========================================")
+
+    
+    # Move 1 to Move 2 Transition
+    println(move_1_to_move_2_transition_prompt(game))
+    println("==========================================")
+
+
+    # Global Response
+    println(global_response(game))
+    println("==========================================")
+
+
+    # Move 2 Question 1
+    println(move_2_1_prompt(game))
+    println("==========================================")
+
+
+    # Move 2 Question 2
+    println(move_2_2_prompt(game))
+    println("==========================================")
+
+
+    # Move 2 Question 3
+    println(move_2_3_prompt(game))
+    println("==========================================")
+
+end
+
+function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup; verbose=false)
     # Fill the initial results with game config and player config
     results = [game.dir, game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status)]
     for i in 1:6
@@ -154,36 +206,62 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     # Initial prompt and dialogue simulation
     chat!(chat_setup, chat_hist, game_setup_prompt(game, team))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
+
+    # Continue the dialogue prompt
+    chat!(chat_setup, chat_hist, "Continue the dialogue")
+    push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
+
+    chat!(chat_setup, chat_hist, "Continue the dialogue")
+    push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     # Move 1 Question 1
     chat!(chat_setup, chat_hist, move_1_1_prompt(game))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     # Move 1 Question 2
     chat!(chat_setup, chat_hist, move_1_2_prompt(game))
     push!(results, chat_hist[end]["content"])
     push!(results, onehot(chat_hist[end]["content"], move_1_2_options())...)
+    verbose && println(chat_hist[end]["content"])
     
     # Move 1 to Move 2 Transition
     chat!(chat_setup, chat_hist, move_1_to_move_2_transition_prompt(game))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     # Global Response
     chat!(chat_setup, chat_hist, global_response(game))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
+
+    # Continue the dialogue prompt
+    chat!(chat_setup, chat_hist, "Continue the dialogue")
+    push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
+
+    chat!(chat_setup, chat_hist, "Continue the dialogue")
+    push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     # Move 2 Question 1
     chat!(chat_setup, chat_hist, move_2_1_prompt(game))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     # Move 2 Question 2
     chat!(chat_setup, chat_hist, move_2_2_prompt(game))
     push!(results, chat_hist[end]["content"])
     push!(results, onehot(chat_hist[end]["content"], move_2_2_options())...)
+    verbose && println(chat_hist[end]["content"])
 
     # Move 2 Question 3
     chat!(chat_setup, chat_hist, move_2_3_prompt(game))
     push!(results, chat_hist[end]["content"])
+    verbose && println(chat_hist[end]["content"])
 
     return results
 end
@@ -200,12 +278,16 @@ function results_df(::Type{USPRCCrisisSimulation})
         "Player 4" => String[],
         "Player 5" => String[],
         "Player 6" => String[],
-        "Dialogue 1" => String[],
+        "Dialogue 1-1" => String[],
+        "Dialogue 1-2" => String[],
+        "Dialogue 1-3" => String[],
         "Move 1 Question 1" => String[],
         "Move 1 Question 2" => String[],
         [o => String[] for o in move_1_2_options_desc()]...,
         "Move 1 to Move 2 Transition Response" => String[],
-        "Dialogue 2" => String[],
+        "Dialogue 2-1" => String[],
+        "Dialogue 2-2" => String[],
+        "Dialogue 2-3" => String[],
         "Move 2 Question 1" => String[],
         "Move 2 Question 2" => String[],
         [o => String[] for o in move_2_2_options_desc()]...,
