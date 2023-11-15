@@ -7,6 +7,7 @@ include("players.jl")
     AI_accuracy_range = "95-99%" # ["70-85%", "95-99%"]
     AI_system_training = :basic # [:basic, :significant]
     china_status = :revisionist # [:revisionist, :status_quo]
+    n_dialog_steps = 3 
 end
 
 function AI_accuracy_prompt(game::USPRCCrisisSimulation)
@@ -191,7 +192,8 @@ end
 
 function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup; verbose=false)
     # Fill the initial results with game config and player config
-    results = [game.dir, game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status)]
+    @assert game.n_dialog_steps >= 1 "Invalid n_dialog_steps $(game.n_dialog_steps)"
+    results = [game.dir, game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status), string(game.n_dialog_steps)]
     for i in 1:6
         if i <= length(team)
             push!(results, player_description(team[i]))
@@ -209,13 +211,13 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     verbose && println(chat_hist[end]["content"])
 
     # Continue the dialogue prompt
-    chat!(chat_setup, chat_hist, "Continue the dialogue")
-    push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
-
-    chat!(chat_setup, chat_hist, "Continue the dialogue")
-    push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    if game.n_dialog_steps > 1
+        for j in 2:game.n_dialog_steps
+            chat!(chat_setup, chat_hist, "Continue the dialogue")
+            push!(results, chat_hist[end]["content"])
+            verbose && println(chat_hist[end]["content"])
+        end
+    end
 
     # Move 1 Question 1
     chat!(chat_setup, chat_hist, move_1_1_prompt(game))
@@ -239,13 +241,13 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     verbose && println(chat_hist[end]["content"])
 
     # Continue the dialogue prompt
-    chat!(chat_setup, chat_hist, "Continue the dialogue")
-    push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
-
-    chat!(chat_setup, chat_hist, "Continue the dialogue")
-    push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    if game.n_dialog_steps > 1
+        for j in 2:game.n_dialog_steps
+            chat!(chat_setup, chat_hist, "Continue the dialogue")
+            push!(results, chat_hist[end]["content"])
+            verbose && println(chat_hist[end]["content"])
+        end
+    end
 
     # Move 2 Question 1
     chat!(chat_setup, chat_hist, move_2_1_prompt(game))
@@ -264,34 +266,4 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     verbose && println(chat_hist[end]["content"])
 
     return results
-end
-
-function results_df(::Type{USPRCCrisisSimulation})
-    df = DataFrame(
-        "directory" => String[], 
-        "AI Accuracy" => String[],
-        "AI System Training" => String[],
-        "China Status" => String[],
-        "Player 1" => String[],
-        "Player 2" => String[],
-        "Player 3" => String[],
-        "Player 4" => String[],
-        "Player 5" => String[],
-        "Player 6" => String[],
-        "Dialogue 1-1" => String[],
-        "Dialogue 1-2" => String[],
-        "Dialogue 1-3" => String[],
-        "Move 1 Question 1" => String[],
-        "Move 1 Question 2" => String[],
-        [o => String[] for o in move_1_2_options_desc()]...,
-        "Move 1 to Move 2 Transition Response" => String[],
-        "Dialogue 2-1" => String[],
-        "Dialogue 2-2" => String[],
-        "Dialogue 2-3" => String[],
-        "Move 2 Question 1" => String[],
-        "Move 2 Question 2" => String[],
-        [o => String[] for o in move_2_2_options_desc()]...,
-        "Move 2 Question 3" => String[]
-    )
-    return df
 end
