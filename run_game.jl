@@ -1,15 +1,24 @@
 include("src/game.jl")
+include("src/utils.jl")
 using DataFrames
 using CSV
 using Serialization
+using ProgressBars
 
+# TODO keyword passing between config structs
+# TODO automated config attributes into results data frame for logging
+# TODO add debug mode to return empty strings instead of use GPT
+# TODO set and variate text generation length?
+# TODO variate roleplying as chiefs (focus on human backgrounds)?
+# TODO create no_dialog option (direct recommendation)
 
 # Struct for simulation config parameters
 @with_kw struct SimulationConfig
     model::String = "gpt-3.5-turbo-16k"
     secret_key::String = get(ENV, "OPENAI_API_KEY", "")
     wargame_dir::String = "wargame/"
-    out_csv_file::String = "sample_results.csv"
+    output_dir::String = "results/"
+    out_csv_file::String = ""
     boostrap_players::Bool = true
     verbose::Bool = false
     save_results_to_csv::Bool = true
@@ -59,6 +68,14 @@ function run_simulation(config::SimulationConfig)
     # Setup the results dataframe and game dir
     res = results_df(config)
 
+    # Setup outpuf file names
+    if config.out_csv_file == ""
+        ending = create_file_ending(config.output_dir)
+        data_filename = config.output_dir * "data" * ending * ".csv"
+    else
+        data_filename = config.output_dir * config.out_csv_file
+    end 
+
     # Generate Treatments
     treatments = []
     for AI_accuracy in ["70-85%", "95-99%"]
@@ -84,13 +101,13 @@ function run_simulation(config::SimulationConfig)
 
         # Write the results DataFrame to a CSV file
         if config.save_results_to_csv
-            CSV.write("results/" * config.out_csv_file, res)
+            CSV.write(data_filename, res)
         end
     else
         # Run the games
-        for (j, team) in enumerate(teams)
+        for (j, team) in ProgressBar(enumerate(teams))
             println("Team: ", j)
-            for (i, game) in enumerate(treatments)
+            for (i, game) in ProgressBar(enumerate(treatments))
                 println("Running treatment: ", i)
                 try 
                     result = run_game(game, team, chat_setup)
@@ -98,7 +115,7 @@ function run_simulation(config::SimulationConfig)
 
                     # Write the results DataFrame to a CSV file
                     if config.save_results_to_csv
-                        CSV.write("results/" * config.out_csv_file, res)
+                        CSV.write(data_filename, res)
                     end
                 catch e
                     println(e)
