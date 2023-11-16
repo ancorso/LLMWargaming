@@ -1,6 +1,11 @@
 
 using StatsPlots
 using Plots.Measures
+using CSV
+using DataFrames
+
+include("src/game.jl")
+
 df = CSV.read("results/sample_results.csv", DataFrame)
 
 
