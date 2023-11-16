@@ -1,4 +1,5 @@
 using OpenAI
+using Dates
 
 struct ChatSetup
     secret_key::String
@@ -22,5 +23,12 @@ function readfile(dir, filename)
         s = read(f, String)
     end
     return s
+end
+
+function create_file_ending(dir)
+    tod = string(today())
+    file_ind = length(filter(e->occursin(tod, e), readdir(dir)))
+
+    return tod * "_" * string(file_ind)
 end
 
