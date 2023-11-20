@@ -11,6 +11,8 @@ using ProgressBars
 # TODO set and variate text generation length?
 # TODO variate roleplying as chiefs (focus on human backgrounds)?
 # TODO create no_dialog option (direct recommendation)
+# TODO add safety check of answers (did not catch "b, c, e; probably should check that at least one answer is made)
+# TODO create fixed test data set functions (work around ablation parameter changes!)
 
 # Struct for simulation config parameters
 @with_kw struct SimulationConfig
@@ -19,6 +21,9 @@ using ProgressBars
     wargame_dir::String = "wargame/"
     output_dir::String = "results/"
     out_csv_file::String = ""
+    use_dummygpt::Bool = false
+    no_dialog::Bool = false # placeholder
+    no_chiefs::Bool = false # placeholder
     boostrap_players::Bool = true
     verbose::Bool = false
     save_results_to_csv::Bool = true
@@ -63,7 +68,7 @@ function run_simulation(config::SimulationConfig)
     if config.secret_key == ""
         @warn "OPENAI_API_KEY not set in ENV"
     end
-    chat_setup = ChatSetup(config.secret_key, config.model)
+    chat_setup = ChatSetup(config.secret_key, config.model, config.use_dummygpt)
 
     # Setup the results dataframe and game dir
     res = results_df(config)
@@ -129,4 +134,4 @@ function run_simulation(config::SimulationConfig)
 end
 
 # run_simulation(SimulationConfig())
-run_simulation(SimulationConfig(run_test_game=true, verbose=true))
+run_simulation(SimulationConfig(run_test_game=true, verbose=true, use_dummygpt=true))

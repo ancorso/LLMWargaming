@@ -4,16 +4,21 @@ using Dates
 struct ChatSetup
     secret_key::String
     model::String
+    use_dummygpt::Bool
 end
 
 function chat!(setup, chat_hist, prompt)
     push!(chat_hist, Dict("role" => "user", "content"=> prompt))
-    r = create_chat(
-        setup.secret_key, 
-        setup.model,
-        chat_hist
-      )
-    message = r.response[:choices][1][:message]
+    if setup.use_dummygpt
+        message = Dict(:role => "ROLE", :content => "CONTENT")
+    else
+        r = create_chat(
+            setup.secret_key, 
+            setup.model,
+            chat_hist
+        )
+        message = r.response[:choices][1][:message]
+    end
     push!(chat_hist, Dict("role" => message[:role], "content"=> message[:content]))
 end
 
