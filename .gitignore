@@ -27,3 +27,5 @@ Manifest.toml
 *.csv
 
 .DS_Store
+*.png
+*.pdf
