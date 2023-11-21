@@ -124,9 +124,17 @@ function onehot(response, options)
         if option isa String
             if occursin(option, response)
                 push!(responses, "True")
+            # Catch cases like response = "a, b, c":
+            # 1) separate by ","
+            # 2) remove spaces at start and end
+            # 3) look for perfect match without paraenthesis
+            # TODO --> Will not catch "other-text-before a, b, c"
+            elseif string(option[2]) in map(strip, split(response, ","))
+                push!(responses, "True")
             else
                 push!(responses, "False")
             end
+        # TODO --> Will not catch "a, b, c"-like responses
         elseif option isa Vector{String}
             if any(occursin.(option, response))
                 push!(responses, "True")
