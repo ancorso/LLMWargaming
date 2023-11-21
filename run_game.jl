@@ -10,9 +10,8 @@ using ProgressBars
 # TODO variate roleplying as chiefs (focus on human backgrounds)?
 # TODO create no_dialog option (direct recommendation)
 # TODO add safety check of answers (did not catch "b, c, e; probably should check that at least one answer is made)
-# TODO create fixed test data set functions (work around ablation parameter changes!)
 
-# Everything not set will result in usage of defaul values 
+# Everything not set will result in usage of default values 
 conf = init_sim_conf(
     # model="gpt-3.5-turbo-16k",
     # secret_key=get(ENV, "OPENAI_API_KEY", ""),
@@ -20,6 +19,7 @@ conf = init_sim_conf(
     # output_dir="results/",
     # out_csv_file="",
     use_dummygpt=true,
+    use_bench_players=true,
     no_dialog=false, # placeholder
     no_chiefs=false, # placeholder
     boostrap_players=true,
@@ -50,22 +50,16 @@ function run_simulation(config::SimulationConfig)
         data_filename = config.output_dir * config.out_csv_file
     end 
 
+    if conf.use_bench_players
+        test_data = deserialize("wargame/test_data.jls")
+        treatments = test_data[1]
+        teams = test_data[2]
+    else
     # Generate Treatments
-    treatments = []
-    for AI_accuracy in ["70-85%", "95-99%"]
-        for AI_system_training in [:basic, :significant]
-            for china_status in [:revisionist, :status_quo]
-                push!(treatments, USPRCCrisisSimulation(config.wargame_dir, AI_accuracy, AI_system_training, china_status))
-            end
-        end
-    end
+        treatments = gen_all_treatments(config)
 
     # Generate teams
-    if config.boostrap_players
-        loaded_player_data = deserialize(config.wargame_dir * "player_data.jls")
-        teams = [[rand(loaded_player_data) for i in 1:config.n_players] for i=1:config.n_teams]
-    else
-        teams = [[Player() for i in 1:config.n_players] for i=1:config.n_teams]
+        teams = gen_teams(config)
     end
 
     # Run a test game or all treatments * teams

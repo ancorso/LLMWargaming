@@ -10,6 +10,44 @@ include("simulation.jl")
     china_status = :revisionist # [:revisionist, :status_quo]
 end
 
+# Generate treatments
+function gen_all_treatments(config::SimulationConfig)
+    treatments = []
+    for AI_accuracy in ["70-85%", "95-99%"]
+        for AI_system_training in [:basic, :significant]
+            for china_status in [:revisionist, :status_quo]
+                push!(treatments, USPRCCrisisSimulation(config.wargame_dir, AI_accuracy, AI_system_training, china_status))
+            end
+        end
+    end
+
+    return treatments
+end
+
+# Generate teams
+function gen_teams(config)
+    if config.boostrap_players
+        loaded_player_data = deserialize(config.wargame_dir * "player_data.jls")
+        teams = [[rand(loaded_player_data) for i in 1:config.n_players] for i=1:config.n_teams]
+    else
+        teams = [[Player() for i in 1:config.n_players] for i=1:config.n_teams]
+    end
+
+    return teams
+end
+
+function gen_benchmark_dataset(config::SimulationConfig)
+    # Generate Treatments
+    treatments = gen_all_treatments(config)
+
+    # Generate teams
+    teams = gen_teams(config)
+
+    serialize("wargame/test_data.jls", [treatments, teams])
+end
+# gen_benchmark_dataset(SimulationConfig())
+
+
 function AI_accuracy_prompt(game::USPRCCrisisSimulation)
     s = readfile(game.dir, "AI_accuracy.txt")
     s = replace(s, "AI_ACCURACY_RANGE" => game.AI_accuracy_range)

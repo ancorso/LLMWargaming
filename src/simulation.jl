@@ -11,6 +11,7 @@ using Parameters
     output_dir::String = "results/"
     out_csv_file::String = ""
     use_dummygpt::Bool = false
+    use_bench_players::Bool = false
     no_dialog::Bool = false # placeholder
     no_chiefs::Bool = false # placeholder
     boostrap_players::Bool = true
