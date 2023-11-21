@@ -1,66 +1,35 @@
 include("src/game.jl")
+include("src/simulation.jl")
 include("src/utils.jl")
 using DataFrames
 using CSV
 using Serialization
 using ProgressBars
 
-# TODO keyword passing between config structs
-# TODO automated config attributes into results data frame for logging
-# TODO add debug mode to return empty strings instead of use GPT
 # TODO set and variate text generation length?
 # TODO variate roleplying as chiefs (focus on human backgrounds)?
 # TODO create no_dialog option (direct recommendation)
 # TODO add safety check of answers (did not catch "b, c, e; probably should check that at least one answer is made)
 # TODO create fixed test data set functions (work around ablation parameter changes!)
 
-# Struct for simulation config parameters
-@with_kw struct SimulationConfig
-    model::String = "gpt-3.5-turbo-16k"
-    secret_key::String = get(ENV, "OPENAI_API_KEY", "")
-    wargame_dir::String = "wargame/"
-    output_dir::String = "results/"
-    out_csv_file::String = ""
-    use_dummygpt::Bool = false
-    no_dialog::Bool = false # placeholder
-    no_chiefs::Bool = false # placeholder
-    boostrap_players::Bool = true
-    verbose::Bool = false
-    save_results_to_csv::Bool = true
-    run_test_game::Bool = false
-    n_teams::Int = 10
-    n_players::Int = 6
-    n_dialog_steps::Int = 3
-end
-
-
-function results_df(cnf::SimulationConfig)
-    df = DataFrame(
-        "directory" => String[], 
-        "AI Accuracy" => String[],
-        "AI System Training" => String[],
-        "China Status" => String[],
-        "N Dialog Steps" => String[],
-        "Player 1" => String[],
-        "Player 2" => String[],
-        "Player 3" => String[],
-        "Player 4" => String[],
-        "Player 5" => String[],
-        "Player 6" => String[],
-        ["Dialogue 1-$(i)" => String[] for i in 1:cnf.n_dialog_steps]...,
-        "Move 1 Question 1" => String[],
-        "Move 1 Question 2" => String[],
-        [o => String[] for o in move_1_2_options_desc()]...,
-        "Move 1 to Move 2 Transition Response" => String[],
-        ["Dialogue 2-$(i)" => String[] for i in 1:cnf.n_dialog_steps]...,
-        "Move 2 Question 1" => String[],
-        "Move 2 Question 2" => String[],
-        [o => String[] for o in move_2_2_options_desc()]...,
-        "Move 2 Question 3" => String[]
+# Everything not set will result in usage of defaul values 
+conf = init_sim_conf(
+    # model="gpt-3.5-turbo-16k",
+    # secret_key=get(ENV, "OPENAI_API_KEY", ""),
+    # wargame_dir="wargame/",
+    # output_dir="results/",
+    # out_csv_file="",
+    use_dummygpt=true,
+    no_dialog=false, # placeholder
+    no_chiefs=false, # placeholder
+    boostrap_players=true,
+    verbose=true,
+    # save_results_to_csv=true,
+    run_test_game=true,
+    n_teams=10,
+    n_players=6,
+    n_dialog_steps=2,
     )
-    return df
-end
-
 
 function run_simulation(config::SimulationConfig)
 
@@ -86,7 +55,7 @@ function run_simulation(config::SimulationConfig)
     for AI_accuracy in ["70-85%", "95-99%"]
         for AI_system_training in [:basic, :significant]
             for china_status in [:revisionist, :status_quo]
-                push!(treatments, USPRCCrisisSimulation(config.wargame_dir, AI_accuracy, AI_system_training, china_status, config.n_dialog_steps))
+                push!(treatments, USPRCCrisisSimulation(config.wargame_dir, AI_accuracy, AI_system_training, china_status))
             end
         end
     end
@@ -101,7 +70,7 @@ function run_simulation(config::SimulationConfig)
 
     # Run a test game or all treatments * teams
     if config.run_test_game
-        result = run_game(treatments[1], teams[1], chat_setup, verbose=config.verbose)
+        result = run_game(config, treatments[1], teams[1], chat_setup)
         push!(res, result)
 
         # Write the results DataFrame to a CSV file
@@ -115,7 +84,7 @@ function run_simulation(config::SimulationConfig)
             for (i, game) in ProgressBar(enumerate(treatments))
                 println("Running treatment: ", i)
                 try 
-                    result = run_game(game, team, chat_setup)
+                    result = run_game(config, game, team, chat_setup)
                     push!(res, result)
 
                     # Write the results DataFrame to a CSV file
@@ -134,4 +103,5 @@ function run_simulation(config::SimulationConfig)
 end
 
 # run_simulation(SimulationConfig())
-run_simulation(SimulationConfig(run_test_game=true, verbose=true, use_dummygpt=true))
+# run_simulation(SimulationConfig(run_test_game=true, verbose=true, use_dummygpt=true))
+run_simulation(conf)

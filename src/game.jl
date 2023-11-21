@@ -1,13 +1,13 @@
 using Parameters
 include("utils.jl")
 include("players.jl")
+include("simulation.jl")
 
 @with_kw struct USPRCCrisisSimulation
     dir = "wargame"
     AI_accuracy_range = "95-99%" # ["70-85%", "95-99%"]
     AI_system_training = :basic # [:basic, :significant]
     china_status = :revisionist # [:revisionist, :status_quo]
-    n_dialog_steps = 3 
 end
 
 function AI_accuracy_prompt(game::USPRCCrisisSimulation)
@@ -190,11 +190,16 @@ function print_prompts(game::USPRCCrisisSimulation, team::Vector{Player})
 
 end
 
-function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup; verbose=false)
+function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup)
     # Fill the initial results with game config and player config
-    @assert game.n_dialog_steps >= 1 "Invalid n_dialog_steps $(game.n_dialog_steps)"
-    results = [game.dir, game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status), string(game.n_dialog_steps)]
-    for i in 1:6
+    @assert conf.n_dialog_steps >= 1 "Invalid n_dialog_steps $(conf.n_dialog_steps)"
+
+    # Add simulation config values
+    results = [string(getfield(conf, f)) for f in get_pars4store()[1]]
+    # Add game config values
+    push!(results, [game.AI_accuracy_range, String(game.AI_system_training), String(game.china_status)]...)
+
+    for i in 1:conf.n_players
         if i <= length(team)
             push!(results, player_description(team[i]))
         else
@@ -208,62 +213,62 @@ function run_game(game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup:
     # Initial prompt and dialogue simulation
     chat!(chat_setup, chat_hist, game_setup_prompt(game, team))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Continue the dialogue prompt
-    if game.n_dialog_steps > 1
-        for j in 2:game.n_dialog_steps
+    if conf.n_dialog_steps > 1
+        for j in 2:conf.n_dialog_steps
             chat!(chat_setup, chat_hist, "Continue the dialogue")
             push!(results, chat_hist[end]["content"])
-            verbose && println(chat_hist[end]["content"])
+            conf.verbose && println(chat_hist[end]["content"])
         end
     end
 
     # Move 1 Question 1
     chat!(chat_setup, chat_hist, move_1_1_prompt(game))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Move 1 Question 2
     chat!(chat_setup, chat_hist, move_1_2_prompt(game))
     push!(results, chat_hist[end]["content"])
     push!(results, onehot(chat_hist[end]["content"], move_1_2_options())...)
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
     
     # Move 1 to Move 2 Transition
     chat!(chat_setup, chat_hist, move_1_to_move_2_transition_prompt(game))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Global Response
     chat!(chat_setup, chat_hist, global_response(game))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Continue the dialogue prompt
-    if game.n_dialog_steps > 1
-        for j in 2:game.n_dialog_steps
+    if conf.n_dialog_steps > 1
+        for j in 2:conf.n_dialog_steps
             chat!(chat_setup, chat_hist, "Continue the dialogue")
             push!(results, chat_hist[end]["content"])
-            verbose && println(chat_hist[end]["content"])
+            conf.verbose && println(chat_hist[end]["content"])
         end
     end
 
     # Move 2 Question 1
     chat!(chat_setup, chat_hist, move_2_1_prompt(game))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Move 2 Question 2
     chat!(chat_setup, chat_hist, move_2_2_prompt(game))
     push!(results, chat_hist[end]["content"])
     push!(results, onehot(chat_hist[end]["content"], move_2_2_options())...)
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     # Move 2 Question 3
     chat!(chat_setup, chat_hist, move_2_3_prompt(game))
     push!(results, chat_hist[end]["content"])
-    verbose && println(chat_hist[end]["content"])
+    conf.verbose && println(chat_hist[end]["content"])
 
     return results
 end
