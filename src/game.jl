@@ -1,7 +1,9 @@
+
 using Parameters
 include("utils.jl")
 include("players.jl")
 include("simulation.jl")
+
 
 @with_kw struct USPRCCrisisSimulation
     dir = "wargame"
@@ -44,9 +46,10 @@ function gen_benchmark_dataset(config::SimulationConfig)
     teams = gen_teams(config)
 
     serialize("wargame/test_data.jls", [treatments, teams])
+
+    return [treatments, teams]
 end
 # gen_benchmark_dataset(SimulationConfig())
-
 
 function AI_accuracy_prompt(game::USPRCCrisisSimulation)
     s = readfile(game.dir, "AI_accuracy.txt")
@@ -134,7 +137,7 @@ function onehot(response, options)
             error("Invalid option type")
         end
     end
-    responses
+    return responses
 end
 
 function move_1_2_options()
@@ -166,7 +169,7 @@ function move_1_2_options_shortdesc()
 end
 
 function move_2_2_options()
-    [["(a)", "(a1)", "(a2)", "(a3)"], ["(1)", "(a1)"], ["(2)", "(a2)"], ["(3)", "(a3)"], "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)"]
+    return [["(a)", "(a1)", "(a2)", "(a3)"], ["(1)", "(a1)"], ["(2)", "(a2)"], ["(3)", "(a3)"], "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)"]
 end
 
 function move_2_2_options_desc()

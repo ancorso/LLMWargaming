@@ -1,5 +1,7 @@
+
 using Parameters
 using Distributions
+
 
 function age_range_options()
     return ["under 18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"]

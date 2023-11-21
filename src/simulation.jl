@@ -1,6 +1,5 @@
 
 using Parameters
-# include("src/utils.jl")
 
 
 # Struct for simulation config parameters

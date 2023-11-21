@@ -1,5 +1,7 @@
+
 using OpenAI
 using Dates
+
 
 struct ChatSetup
     secret_key::String
@@ -36,4 +38,3 @@ function create_file_ending(dir)
 
     return tod * "_" * string(file_ind)
 end
-

@@ -1,3 +1,4 @@
+
 include("src/game.jl")
 include("src/simulation.jl")
 include("src/utils.jl")
@@ -6,10 +7,11 @@ using CSV
 using Serialization
 using ProgressBars
 
+
 # TODO set and variate text generation length?
 # TODO variate roleplying as chiefs (focus on human backgrounds)?
 # TODO create no_dialog option (direct recommendation)
-# TODO add safety check of answers (did not catch "b, c, e; probably should check that at least one answer is made)
+# TODO add safety check of answers (did not catch "b, c, e"; probably should check that at least one answer is made)
 
 # Everything not set will result in usage of default values 
 conf = init_sim_conf(
@@ -29,11 +31,12 @@ conf = init_sim_conf(
     n_teams=10,
     n_players=6,
     n_dialog_steps=2,
-    )
+)
 
 function run_simulation(config::SimulationConfig)
 
     # Prepare the connection to the GPT model
+    # TODO? turn into assert and combine with && !config.use_dummygpt
     if config.secret_key == ""
         @warn "OPENAI_API_KEY not set in ENV"
     end
@@ -55,10 +58,10 @@ function run_simulation(config::SimulationConfig)
         treatments = test_data[1]
         teams = test_data[2]
     else
-    # Generate Treatments
+        # Generate Treatments
         treatments = gen_all_treatments(config)
 
-    # Generate teams
+        # Generate teams
         teams = gen_teams(config)
     end
 
