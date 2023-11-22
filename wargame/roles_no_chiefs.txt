@@ -1,0 +1,20 @@
+
+Roles: Strategic Level Game (NSC Deputies Staff):
+The human players should try to act like the deputy cabinet officials responding to an international security crisis
+* Deputy National Security Advisor (Chair)
+* Deputy Secretary of Defense (DEPSECDEF)
+* Vice Chairman Joint Chiefs of Staff (VCJCS)
+* Deputy Director of National Intelligence
+* Deputy Secretary of State
+* USINDOPACOM Commander
+
+Role Details given to the human players:
+
+* You assume the role of deputy cabinet officials to advise the President on how to respond to the crisis
+* The Cabinet can draw upon the full diplomatic, economic and financial, military, informational and intelligence capabilities of the United States; recommendations can leverage all the tools of statecraft
+* When you transition to your groups, you will receive a Military Backgrounder and additional information to inform your decisions
+    * The Military Backgrounder is a useful reference but does not introduce any substantive, new information not included in this briefing
+* The planning horizon is one week (7 days); functionally, you are restricted to the U.S. forces in the Indo-Pacific AOR but may leverage other tools of statecraft
+* You may request additional forces and provide recommendations, such as initiating a pre-existing military response plan (any discussion of any real-world plans is strictly outside the scope of this event)
+* Do not assume that any requests will be fulfilled, and certainly not within the planning horizon
+* The information you receive will be limited and imperfect; reflecting the reality of a fast-moving crisis and game constraints

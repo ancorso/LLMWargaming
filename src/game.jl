@@ -69,7 +69,11 @@ function game_setup_prompt(conf::SimulationConfig, game::USPRCCrisisSimulation, 
     s = s * team_description(team) * "\n\n"
     s = s * readfile(game.dir, "scenario.txt") * "\n\n"
     s = s * readfile(game.dir, "incident.txt") * "\n\n"
-    s = s * readfile(game.dir, "roles.txt") * "\n\n"
+    if conf.no_chiefs
+        s = s * readfile(game.dir, "roles_no_chiefs.txt") * "\n\n"
+    else
+        s = s * readfile(game.dir, "roles.txt") * "\n\n"
+    end
     s = s * readfile(game.dir, "available_forces.txt") * "\n\n"
     s = s * AI_accuracy_prompt(game) * "\n\n"
     if conf.no_dialog
