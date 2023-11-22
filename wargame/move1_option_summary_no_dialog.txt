@@ -1,0 +1,10 @@
+How would the players as a group answer the following questions? (but don't yet answer them!)
+(1) Describe your Desired End State:
+(2) Select your orders for engaging (select all that apply)
+    (a) Fire at Chinese vessels within close proximity of CSG with any weapon mission commander deems appropriate
+    (b) Hold fire unless fired upon
+    (c) Hold fire without approval from President
+    (d) Place automated defenses on auto-fire. AI decides target/AI decides firing.
+    (e) Place automated defenses on manual firing control. AI decides target/human decides firing.
+    (f) Human decides target/human decides firing
+    (g) Hold fire at all costs

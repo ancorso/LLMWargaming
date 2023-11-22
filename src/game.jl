@@ -64,7 +64,7 @@ function AI_accuracy_prompt(game::USPRCCrisisSimulation)
     return s
 end
 
-function game_setup_prompt(game::USPRCCrisisSimulation, team::Vector{Player})
+function game_setup_prompt(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vector{Player})
     s = readfile(game.dir, "context.txt") * "\n\n"
     s = s * team_description(team) * "\n\n"
     s = s * readfile(game.dir, "scenario.txt") * "\n\n"
@@ -72,7 +72,11 @@ function game_setup_prompt(game::USPRCCrisisSimulation, team::Vector{Player})
     s = s * readfile(game.dir, "roles.txt") * "\n\n"
     s = s * readfile(game.dir, "available_forces.txt") * "\n\n"
     s = s * AI_accuracy_prompt(game) * "\n\n"
-    s = s * readfile(game.dir, "move1_option_summary.txt") * "\n\n"
+    if conf.no_dialog
+        s = s * readfile(game.dir, "move1_option_summary_no_dialog.txt") * "\n\n"
+    else
+        s = s * readfile(game.dir, "move1_option_summary.txt") * "\n\n"
+    end
     return s
 end
 
@@ -89,11 +93,16 @@ function move_1_2_prompt(game::USPRCCrisisSimulation)
     return pose_question(readfile(game.dir, "move1-2.txt"))
 end
 
-function move_1_to_move_2_transition_prompt(game::USPRCCrisisSimulation)
-    return readfile(game.dir, "move1_to_move2_transition.txt") * "\n\n"
+function move_1_to_move_2_transition_prompt(conf::SimulationConfig, game::USPRCCrisisSimulation)
+    if conf.no_dialog
+        s = readfile(game.dir, "move1_to_move2_transition_no_dialog.txt") * "\n\n"
+    else
+        s = readfile(game.dir, "move1_to_move2_transition.txt") * "\n\n"
+    end
+    return s
 end
 
-function global_response(game::USPRCCrisisSimulation)
+function global_response(conf::SimulationConfig, game::USPRCCrisisSimulation)
     s = readfile(game.dir, "global_response_move2.txt") * "\n\n"
     if game.china_status == :revisionist
         s = s * readfile(game.dir, "revisionist_china.txt") * "\n\n"
@@ -102,7 +111,11 @@ function global_response(game::USPRCCrisisSimulation)
     else
         error("Invalid China status option")
     end
-    s = s * readfile(game.dir, "move2_option_summary.txt") * "\n\n"
+    if conf.no_dialog
+        s = s * readfile(game.dir, "move2_option_summary_no_dialog.txt") * "\n\n"
+    else
+        s = s * readfile(game.dir, "move2_option_summary.txt") * "\n\n"
+    end
     return s
 end
 
@@ -199,8 +212,8 @@ function move_2_2_options_desc()
     ]
 end
 
-function print_prompts(game::USPRCCrisisSimulation, team::Vector{Player})
-    println(game_setup_prompt(game, team))
+function print_prompts(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vector{Player})
+    println(game_setup_prompt(conf, game, team))
     println("==========================================")
 
     # Move 1 Question 1
@@ -214,12 +227,12 @@ function print_prompts(game::USPRCCrisisSimulation, team::Vector{Player})
 
     
     # Move 1 to Move 2 Transition
-    println(move_1_to_move_2_transition_prompt(game))
+    println(move_1_to_move_2_transition_prompt(conf, game))
     println("==========================================")
 
 
     # Global Response
-    println(global_response(game))
+    println(global_response(conf, game))
     println("==========================================")
 
 
@@ -260,7 +273,7 @@ function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vec
     chat_hist = []
 
     # Initial prompt and dialogue simulation
-    chat!(chat_setup, chat_hist, game_setup_prompt(game, team))
+    chat!(chat_setup, chat_hist, game_setup_prompt(conf, game, team))
     push!(results, chat_hist[end]["content"])
     conf.verbose && println(chat_hist[end]["content"])
 
@@ -285,12 +298,12 @@ function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vec
     conf.verbose && println(chat_hist[end]["content"])
     
     # Move 1 to Move 2 Transition
-    chat!(chat_setup, chat_hist, move_1_to_move_2_transition_prompt(game))
+    chat!(chat_setup, chat_hist, move_1_to_move_2_transition_prompt(conf, game))
     push!(results, chat_hist[end]["content"])
     conf.verbose && println(chat_hist[end]["content"])
 
     # Global Response
-    chat!(chat_setup, chat_hist, global_response(game))
+    chat!(chat_setup, chat_hist, global_response(conf, game))
     push!(results, chat_hist[end]["content"])
     conf.verbose && println(chat_hist[end]["content"])
 
