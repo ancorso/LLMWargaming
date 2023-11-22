@@ -253,9 +253,13 @@ function print_prompts(conf::SimulationConfig, game::USPRCCrisisSimulation, team
 end
 
 function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vector{Player}, chat_setup::ChatSetup)
-    # Fill the initial results with game config and player config
-    @assert conf.n_dialog_steps >= 1 "Invalid n_dialog_steps $(conf.n_dialog_steps)"
+    if conf.no_dialog
+        @assert conf.n_dialog_steps == 0 "Invalid n_dialog_steps $(conf.n_dialog_steps) for no_dialog"
+    else
+        @assert conf.n_dialog_steps >= 1 "Invalid n_dialog_steps $(conf.n_dialog_steps)"
+    end
 
+    # Fill the initial results with game config and player config
     # Add simulation config values
     results = [string(getfield(conf, f)) for f in get_pars4store()[1]]
     # Add game config values
@@ -274,11 +278,13 @@ function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vec
 
     # Initial prompt and dialogue simulation
     chat!(chat_setup, chat_hist, game_setup_prompt(conf, game, team))
-    push!(results, chat_hist[end]["content"])
-    conf.verbose && println(chat_hist[end]["content"])
+    if !conf.no_dialog
+        push!(results, chat_hist[end]["content"])
+        conf.verbose && println(chat_hist[end]["content"])
+    end
 
     # Continue the dialogue prompt
-    if conf.n_dialog_steps > 1
+    if conf.n_dialog_steps > 1 && !conf.no_dialog
         for j in 2:conf.n_dialog_steps
             chat!(chat_setup, chat_hist, "Continue the dialogue")
             push!(results, chat_hist[end]["content"])
@@ -304,11 +310,13 @@ function run_game(conf::SimulationConfig, game::USPRCCrisisSimulation, team::Vec
 
     # Global Response
     chat!(chat_setup, chat_hist, global_response(conf, game))
-    push!(results, chat_hist[end]["content"])
-    conf.verbose && println(chat_hist[end]["content"])
+    if !conf.no_dialog
+        push!(results, chat_hist[end]["content"])
+        conf.verbose && println(chat_hist[end]["content"])
+    end
 
     # Continue the dialogue prompt
-    if conf.n_dialog_steps > 1
+    if conf.n_dialog_steps > 1 && !conf.no_dialog
         for j in 2:conf.n_dialog_steps
             chat!(chat_setup, chat_hist, "Continue the dialogue")
             push!(results, chat_hist[end]["content"])
