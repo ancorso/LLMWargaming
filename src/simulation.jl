@@ -11,8 +11,8 @@ using Parameters
     out_csv_file::String = ""
     use_dummygpt::Bool = false
     use_bench_players::Bool = false
-    no_dialog::Bool = false # placeholder
-    no_chiefs::Bool = false # placeholder
+    no_dialog::Bool = false 
+    no_chiefs::Bool = false 
     boostrap_players::Bool = true
     verbose::Bool = false
     save_results_to_csv::Bool = true
