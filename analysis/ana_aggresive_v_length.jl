@@ -3,6 +3,7 @@ using Random
 using Plots
 using CSV
 using DataFrames
+using StatsBase
 include("../src/game.jl")
 
 Random.seed!(1234)
@@ -42,32 +43,59 @@ function get_frac_aggr(df)
     move_2_paci = [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]
     mask_paci = [move_1_paci..., move_2_paci...]
 
-    fac_aggro = mean([sum(r .* mask_aggro) for r in res_val])
-    fac_paci = mean([sum(r .* mask_paci)for r in res_val])
+    fac_aggro_all = [sum(r .* mask_aggro) for r in res_val]
+    fac_paci_all = [sum(r .* mask_paci) for r in res_val]
 
-    return (fac_aggro - fac_paci)/norm
+    aggro = (mean(fac_aggro_all) - mean(fac_paci_all)) / norm
+
+    # do bootstrap
+    n_b = 20000
+    n_dat = length(fac_aggro_all)
+
+    boot_res = []
+    for _ in 1:n_b
+        boot_aggro = StatsBase.sample(fac_aggro_all, n_dat, replace=true)
+        boot_paci = StatsBase.sample(fac_paci_all, n_dat, replace=true)
+
+        boot = (mean(boot_aggro) - mean(boot_paci)) / norm
+
+        append!(boot_res, [boot])
+    end
+
+    lower = sort([d for d in boot_res])[round(Int, n_b * 0.025)]
+    upper = sort([d for d in boot_res])[round(Int, n_b * 0.975)]
+    errors = ((aggro - lower), (upper - aggro))
+
+    return aggro, errors
 end
 
-aggro = [
-    get_frac_aggr(df_dialogno),
-    get_frac_aggr(df_dialog1),
-    get_frac_aggr(df_dialog3),
-    get_frac_aggr(df_dialog6),
-]
-aggro_h = get_frac_aggr(df_real)
+function make_plot()
+    aggro = [
+        get_frac_aggr(df_dialogno),
+        get_frac_aggr(df_dialog1),
+        get_frac_aggr(df_dialog3),
+        get_frac_aggr(df_dialog6),
+    ]
+    aggro_h = get_frac_aggr(df_real)
 
-plot(
-    xlabel="Length of Simulated Dialog [a.u.]",
-    ylabel="Aggresivness [a.u.]",
-    title="",
-    legend=:bottomright,
-)
-plot!(
-    [0., 1., 3., 6.],
-    aggro,
-    marker=true,
-    label="LLM Data",
-    dpi=300,
-)
-hline!([aggro_h], linestyle=:dash, linecolor="#100B00", label="Human Players")
-savefig("both_moves_aggresivness_v_dialoglength.png")
+    s = plot(
+        xlabel="Length of Simulated Dialog [a.u.]",
+        ylabel="Aggresivness [a.u.]",
+        title="",
+        legend=:bottomright,
+    )
+    scatter!(
+        [0., 1., 3., 6.],
+        [a[1] for a in aggro],
+        yerror=[a[2] for a in aggro],
+        marker=true,
+        label="LLM Data (95% Conf.)",
+        dpi=300,
+    )
+    plot!([0., 1., 3., 6.], fill(aggro_h[1], 4), ribbon=aggro_h[2], label="Human Players (95% Conf.)", fillalpha=0.2)
+
+    return s
+end
+
+make_plot()
+# savefig("both_moves_aggresivness_v_dialoglength.png")

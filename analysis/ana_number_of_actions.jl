@@ -32,14 +32,35 @@ function get_number_of_answers(df)
 
     res = df[!, options]
     res_val = [[values(e)...] for e in eachrow(res)]
-    fac_aggro = mean([sum(r) for r in res_val])
+    action_counts_all = [sum(r) for r in res_val]
+    action_counts = mean(action_counts_all)
 
-    return fac_aggro
+    # do bootstrap
+    n_b = 20000
+    n_dat = length(action_counts_all)
+
+    boot_res = []
+    for _ in 1:n_b
+        boot_count = StatsBase.sample(action_counts_all, n_dat, replace=true)
+        boot = mean(boot_count)
+        append!(boot_res, [boot])
+    end
+
+    lower = sort([d for d in boot_res])[round(Int, n_b * 0.025)]
+    upper = sort([d for d in boot_res])[round(Int, n_b * 0.975)]
+    errors = ((action_counts - lower), (upper - action_counts))
+
+    return action_counts, errors
 end
 
-get_number_of_answers(df_dialogno)
-get_number_of_answers(df_dialog1)
-get_number_of_answers(df_dialog3)
-get_number_of_answers(df_dialog6)
+# get_number_of_answers(df_dialogno)
+# get_number_of_answers(df_dialog1)
+# get_number_of_answers(df_dialog3)
+# get_number_of_answers(df_dialog6)
 
+get_number_of_answers(df_dialog3)
 get_number_of_answers(df_real)
+
+# Result --> need more data, but will be hard without more human data
+# (10.61, (0.73, 0.73))
+# (9.20, (1.0, 1.07))
