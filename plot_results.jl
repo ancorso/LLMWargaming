@@ -62,6 +62,17 @@ groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="M
 # savefig("move2.png")
 
 
+n, y, g = compare_treatments_move1(df_real, ai_column_name, ai_accuracies)
+groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="Move 1", dpi=300)
+# savefig("move1.png")
+
+
+n, y, g = compare_treatments_move2(df_real, china_column_name, china_treatments)
+groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="Move 2", dpi=300)
+# savefig("move2.png")
+
+
+
 
 df_real = CSV.read("data/ganz_data_full.csv", DataFrame)
 df_dialogno = CSV.read("results/sensitivity_studies/data_dialogno.csv", DataFrame)
@@ -441,3 +452,79 @@ create_pca_plot(df_dialog3, df_real, "Dialog3/Human", ["Dialog3", "Human"]; move
 create_pca_plot(df_dialog3, df_real, "Dialog3/Human", ["Dialog3", "Human"]; move=2, method=meth, add_random=true)
 # savefig(meth * "_move2_dialog3_v_human_v_random.png")
 create_pca_plot(df_dialog6, df_real, "Dialog6/Human", ["Dialog6", "Human"]; move=2, method=meth)
+
+
+
+function get_frac_aggr(df)
+    options = [move_1_2_options_desc()..., move_2_2_options_desc()...]
+    # res_mat = Matrix(df[:, options])
+
+    res = df[!, options]
+    res_val = [[values(e)...] for e in eachrow(res)]
+
+    move_1_aggro = [1, 0, 0, 1, 1, 1, 0]
+    move_2_aggro = [1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1]
+    # move_2_aggro = zeros(14)
+    mask_aggro = [move_1_aggro..., move_2_aggro...]
+    norm = length(mask_aggro)
+
+    move_1_paci = [0, 1, 1, 0, 0, 0, 1]
+    move_2_paci = [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]
+    # move_2_paci = zeros(14)
+    mask_paci = [move_1_paci..., move_2_paci...]
+
+    fac_aggro = mean([sum(r .* mask_aggro)/norm for r in res_val])
+    fac_paci = mean([sum(r .* mask_paci)/norm for r in res_val])
+
+    println(mean(fac_aggro))
+    println(mean(fac_paci))
+
+    return fac_aggro - fac_paci
+end
+
+aggro = [
+    get_frac_aggr(df_dialogno),
+    get_frac_aggr(df_dialog1),
+    get_frac_aggr(df_dialog3),
+    get_frac_aggr(df_dialog6),
+]
+aggro_h = get_frac_aggr(df_real)
+
+# TODO: Do this with uncertainties
+plot(
+    xlabel="Length of Simulated Dialog [a.u.]",
+    ylabel="Aggresivness [a.u.]",
+    title="",
+    legend=:bottomright,
+)
+plot!(
+    [0., 1., 3., 6.],
+    aggro,
+    marker=true,
+    label="LLM Data",
+    dpi=300,
+)
+hline!([aggro_h], linestyle=:dash, linecolor="#100B00", label="Human Players")
+savefig("both_moves_aggresivness_v_dialoglength.png")
+
+
+function get_number_of_answers(df)
+    options = [move_1_2_options_desc()..., move_2_2_options_desc()...]
+    # res_mat = Matrix(df[:, options])
+
+    res = df[!, options]
+    res_val = [[values(e)...] for e in eachrow(res)]
+
+    fac_aggro = mean([sum(r) for r in res_val])
+
+    return fac_aggro
+end
+
+# TODO: Do this with uncertainties
+
+get_number_of_answers(df_dialogno)
+get_number_of_answers(df_dialog1)
+get_number_of_answers(df_dialog3)
+get_number_of_answers(df_dialog6)
+
+get_number_of_answers(df_real)
