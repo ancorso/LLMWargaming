@@ -14,6 +14,8 @@ using Parameters
     no_dialog::Bool = false 
     no_chiefs::Bool = false 
     boostrap_players::Bool = true
+    pacificsm::Bool = false
+    sociopaths::Bool = false
     verbose::Bool = false
     save_results_to_csv::Bool = true
     run_test_game::Bool = false

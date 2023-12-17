@@ -24,6 +24,8 @@ conf = init_sim_conf(
     no_dialog=false,
     no_chiefs=false,
     boostrap_players=true,
+    pacificsm=false,
+    sociopaths=true,
     verbose=false,
     # save_results_to_csv=true,
     run_test_game=true,
@@ -62,6 +64,16 @@ function run_simulation(config::SimulationConfig)
 
         # Generate teams
         teams = gen_teams(config)
+    end
+    
+    if conf.pacificsm
+        for (team_ind, team) in enumerate(teams)
+            teams[team_ind] = [changeXP_player(p, "Strict pacifist") for p in team]
+        end
+    elseif conf.sociopaths
+        for (team_ind, team) in enumerate(teams)
+            teams[team_ind] = [changeXP_player(p, "Aggressive sociopath") for p in team]
+        end
     end
 
     # Run a test game or all treatments * teams

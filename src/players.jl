@@ -44,6 +44,24 @@ end
     US_military_familiarity = rand(US_military_familiarity_options())
 end
 
+function changeXP_player(p::Player, new_XP::String)
+    new_p = Player(
+        age_range=p.age_range,
+        gender=p.gender,
+        government_affiliation=p.government_affiliation,
+        academic_affiliation=p.academic_affiliation,
+        military_affiliation=p.military_affiliation,
+        private_industry_affiliation=p.private_industry_affiliation,
+        non_governmental_organization_affiliation=p.non_governmental_organization_affiliation,
+        other_affiliation=p.other_affiliation,
+        experience=new_XP,
+        AI_familiarity=p.AI_familiarity,
+        China_military_familiarity=p.China_military_familiarity,
+        US_military_familiarity=p.US_military_familiarity
+    )
+    return new_p
+end
+
 function player_description(p::Player)
     s = ""
     if p.description != ""
