@@ -4,6 +4,7 @@ using Plots
 using StatsBase
 using CSV
 using DataFrames
+using PrettyTables
 include("../src/game.jl")
 
 Random.seed!(1234)
@@ -28,7 +29,7 @@ df_dialog6 = CSV.read("results/sensitivity_studies/data_dialog6.csv", DataFrame)
 df_nochief = CSV.read("results/sensitivity_studies/data_nochiefs.csv", DataFrame)
 df_playeruniform = CSV.read("results/sensitivity_studies/data_playeruniform.csv", DataFrame)
 
-function create_boot_diff(df_0, df_1, tit, column_name, treatments; move=1)
+function create_boot_diff(df_0, df_1, tit, column_name, treatments; move=1, return_data=false)
     if move == 1
         short_options = move_1_2_options_shortdesc()
         options = move_1_2_options_desc()
@@ -62,10 +63,14 @@ function create_boot_diff(df_0, df_1, tit, column_name, treatments; move=1)
         delta += 0.1
     end
 
-    fig
+    if return_data
+        return short_options, mus, errors
+    else
+        return fig
+    end
 end
 
-function create_boot_diff(df_0, df_1, tit; move=1)
+function create_boot_diff(df_0, df_1, tit; move=1, return_data=false)
     if move == 1
         short_options = move_1_2_options_shortdesc()
         options = move_1_2_options_desc()
@@ -92,7 +97,11 @@ function create_boot_diff(df_0, df_1, tit; move=1)
         dpi=300,
     )
 
-    fig
+    if return_data
+        return short_options, mus, errors
+    else
+        return fig
+    end
 end
 
 
@@ -226,3 +235,26 @@ create_boot_diff(df_dialogno, df_real, "no Dialoge - Human Data"; move=2)
 # savefig("move2_nodialog_v_humans.png")
 create_boot_diff(df_dialogno, df_real, "no Dialog - Human Data", china_column_name, china_treatments; move=2)
 # savefig("move2_nodialog_v_humans_china.png")
+
+
+
+
+
+# Make a table
+o1, m1, s1 = create_boot_diff(df_dialog3, df_real, "Dialog3 - Human Data"; return_data=true)
+o2, m2, s2 = create_boot_diff(df_dialog3, df_real, "Dialog3 - Human Data"; move=2, return_data=true)
+
+o = vcat(o2)
+m = vcat(m2)
+s = vcat(s2)
+m = map(x->round(x, digits=3), m)
+sp = [err[2] for err in s]
+sm = [err[1] for err in s]
+sp = map(x->round(x, digits=3), sp)
+sm = map(x->round(x, digits=3), sm)
+
+data = transpose(hcat(m, sp, sm))
+header = o
+
+# \newcommand{\adderrors}[3][2]{(#2 + #3)^#1}
+pretty_table(data, backend=Val(:latex), header=header)
