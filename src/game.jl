@@ -75,6 +75,7 @@ function game_setup_prompt(conf::SimulationConfig, game::USPRCCrisisSimulation, 
         s = s * readfile(game.dir, "roles.txt") * "\n\n"
     end
     s = s * readfile(game.dir, "available_forces.txt") * "\n\n"
+    s = s * readfile(game.dir, "new_tech.txt") * "\n\n"
     s = s * AI_accuracy_prompt(game) * "\n\n"
     if conf.no_dialog
         s = s * readfile(game.dir, "move1_option_summary_no_dialog.txt") * "\n\n"
