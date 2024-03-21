@@ -16,6 +16,7 @@ using Parameters
     boostrap_players::Bool = true
     pacificsm::Bool = false
     sociopaths::Bool = false
+    more_disagreement::Bool = false
     verbose::Bool = false
     save_results_to_csv::Bool = true
     run_test_game::Bool = false

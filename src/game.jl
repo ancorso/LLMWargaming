@@ -79,6 +79,8 @@ function game_setup_prompt(conf::SimulationConfig, game::USPRCCrisisSimulation, 
     s = s * AI_accuracy_prompt(game) * "\n\n"
     if conf.no_dialog
         s = s * readfile(game.dir, "move1_option_summary_no_dialog.txt") * "\n\n"
+    elseif conf.more_disagreement
+        s = s * readfile(game.dir, "move1_option_summary_more_disagreement.txt") * "\n\n"
     else
         s = s * readfile(game.dir, "move1_option_summary.txt") * "\n\n"
     end
@@ -118,6 +120,8 @@ function global_response(conf::SimulationConfig, game::USPRCCrisisSimulation)
     end
     if conf.no_dialog
         s = s * readfile(game.dir, "move2_option_summary_no_dialog.txt") * "\n\n"
+    elseif conf.more_disagreement
+        s = s * readfile(game.dir, "move2_option_summary_more_disagreement.txt") * "\n\n"
     else
         s = s * readfile(game.dir, "move2_option_summary.txt") * "\n\n"
     end

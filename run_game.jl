@@ -14,7 +14,8 @@ using ProgressBars
 
 # Everything not set will result in usage of default values 
 conf = init_sim_conf(
-    # model="gpt-3.5-turbo-16k",
+    # model="gpt-4-1106-preview",
+    model="gpt-3.5-turbo-16k",
     # secret_key=get(ENV, "OPENAI_API_KEY", ""),
     # wargame_dir="wargame/",
     # output_dir="results/",
@@ -25,7 +26,8 @@ conf = init_sim_conf(
     no_chiefs=false,
     boostrap_players=true,
     pacificsm=false,
-    sociopaths=true,
+    sociopaths=false,
+    more_disagreement=false,
     verbose=false,
     # save_results_to_csv=true,
     run_test_game=true,
