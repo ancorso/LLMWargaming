@@ -1,7 +1,5 @@
 # LLMWargaming
-LLMs for Wargames
 
+Code repository for the paper "Human vs. Machine: Language Models and Wargames" (https://arxiv.org/abs/2403.03407)
 
-## TODOS
-* Description of theater map
-* Military capabilities backgrounder
+Summary of results: Wargames have a long history in the development of military strategy and the response of nations to threats or attacks. The advent of artificial intelligence (AI) promises better decision-making and increased military effectiveness. However, there is still debate about how AI systems, especially large language models (LLMs), behave compared to humans in high-stakes decision-making scenarios. To this end, we use a new wargame experiment with 107 national security experts designed to look at crisis escalation in a fictional US-China scenario and compare human players to LLM-simulated responses. Here we show considerable agreement in the LLM and human responses and significant quantitative and qualitative differences between simulated and human players in the wargame. These differences depend on intrinsic biases in LLMs regarding the appropriate level of violence following strategic instructions, the choice of LLM, and whether the LLMs are tasked to decide for a team of players directly or first to simulate dialog between players. When simulating the dialog, the discussions lack quality and maintain a farcical harmony. The LLM-simulations cannot account for human player characteristics, showing no significant difference even for extreme traits, e.g., “pacifist” or “aggressive sociopath”. Our results motivate policymakers to be cautious before granting autonomy or following AI-based strategy recommendations. 
