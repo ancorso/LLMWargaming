@@ -29,3 +29,4 @@ Manifest.toml
 .DS_Store
 *.png
 *.pdf
+*.numbers
