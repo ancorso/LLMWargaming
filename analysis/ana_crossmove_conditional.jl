@@ -5,27 +5,9 @@ using StatsBase
 using CSV
 using DataFrames
 using Formatting
-# using PrettyTables
+
 include("../src/game.jl")
-
-SEED = 42
-
-ai_column_name = "AI Accuracy"
-ai_accuracies = ["70-85%", "95-99%"]
-
-train_column_name = "AI System Training"
-train_quality = ["basic", "significant"]
-
-china_column_name = "China Status"
-china_treatments = ["revisionist", "status_quo"]
-
-df_real_feb24 = CSV.read("data/ganz_data_full_updateFeb24.csv", DataFrame)
-
-# post fix
-df_gpt4_dialog0_fix = CSV.read("results/post_fix/data_gpt4_dialog0.csv", DataFrame)
-df_gpt4_dialog3_fix = CSV.read("results/post_fix/data_gpt4_dialog3.csv", DataFrame)
-df_gpt35_dialog0_fix = CSV.read("results/post_fix/data_gpt35_dialog0.csv", DataFrame)
-df_gpt35_dialog3_fix = CSV.read("results/post_fix/data_gpt35_dialog3.csv", DataFrame)
+include("../src/config.jl")
 
 
 function create_transition_matrices(df_0)
@@ -167,8 +149,6 @@ function create_transition_aggro(df_0)
     upper = sort(boot_pacif_aggro)[round(Int, n_b * 0.975)] 
     errors_pacif_aggro = (p_pacif_aggro - lower, upper - p_pacif_aggro)
 
-
-
     println("p_aggro_aggro = $(p_aggro_aggro) +- $(errors_aggro_aggro) [$(p_aggro_aggro - errors_aggro_aggro[1]), $(p_aggro_aggro + errors_aggro_aggro[2])]")
     println("p_pacif_aggro = $(p_pacif_aggro) +- $(errors_pacif_aggro) [$(p_pacif_aggro - errors_pacif_aggro[1]), $(p_pacif_aggro + errors_pacif_aggro[2])]")
 
@@ -176,18 +156,21 @@ function create_transition_aggro(df_0)
 end
 
 function run_crossmove_aggro()
-    labs = ["Humans", "GPT3.5", "GPT4.0", "Random"]
-    res_hum = create_transition_aggro(df_real_feb24)
+    labs = ["Humans", "GPT3.5", "GPT4.0", "GPT4o", "Random"]
+    # res_hum = create_transition_aggro(df_real_feb24)
+    res_hum = create_transition_aggro(df_real_aug24)
     res_gpt35 = create_transition_aggro(df_gpt35_dialog3_fix)
     res_gpt4 = create_transition_aggro(df_gpt4_dialog3_fix)
+    res_gpt4o = create_transition_aggro(df_gpt4o_dialog3_fix)
+
 
     random_df = DataFrame(rand(Bool, (500, size(df_gpt35_dialog3_fix)[2])) .* 1, names(df_gpt35_dialog3_fix))
     res_random = create_transition_aggro(random_df)
 
     scatter(
         labs,
-        [res_hum[1], res_gpt35[1], res_gpt4[1], res_random[1]],
-        yerror=[res_hum[2], res_gpt35[2], res_gpt4[2], res_random[2]],
+        [res_hum[1], res_gpt35[1], res_gpt4[1],  res_gpt4o[1], res_random[1]],
+        yerror=[res_hum[2], res_gpt35[2], res_gpt4[2], res_gpt4o[2], res_random[2]],
         marker=true,
         label="p ( aggro_2 | aggro_1)",
         dpi=300,
@@ -196,8 +179,8 @@ function run_crossmove_aggro()
     )
     scatter!(
         labs,
-        [res_hum[3], res_gpt35[3], res_gpt4[3], res_random[3]],
-        yerror=[res_hum[4], res_gpt35[4], res_gpt4[4], res_random[4]],
+        [res_hum[3], res_gpt35[3], res_gpt4[3], res_gpt4o[3], res_random[3]],
+        yerror=[res_hum[4], res_gpt35[4], res_gpt4[4], res_gpt4o[4], res_random[4]],
         marker=true,
         label="p ( aggro_2 | pacif_1)",
         dpi=300,
@@ -206,9 +189,24 @@ function run_crossmove_aggro()
 end
 run_crossmove_aggro()
 
+# Aug24
+# 48 (Human)
+# p_aggro_aggro = 0.9375 +- (0.08333333333333337, 0.0625) [0.8541666666666666, 1.0]
+# p_pacif_aggro = 0.6458333333333334 +- (0.14583333333333337, 0.125) [0.5, 0.7708333333333334]
+# 80 (GPT3.5)
+# p_aggro_aggro = 0.975 +- (0.03749999999999998, 0.025000000000000022) [0.9375, 1.0]
+# p_pacif_aggro = 0.85 +- (0.08750000000000002, 0.07500000000000007) [0.7625, 0.925]
+# 79 (GPT4)
+# p_aggro_aggro = 0.9873417721518988 +- (0.025316455696202556, 0.012658227848101222) [0.9620253164556962, 1.0]
+# p_pacif_aggro = 0.7341772151898734 +- (0.10126582278481011, 0.10126582278481011) [0.6329113924050633, 0.8354430379746836]
+# 500 (Random)
+# p_aggro_aggro = 0.932 +- (0.02400000000000002, 0.02199999999999991) [0.908, 0.954]
+# p_pacif_aggro = 0.854 +- (0.03200000000000003, 0.030000000000000027) [0.822, 0.884]
 
-
-
+# GPT4o
+# 80
+# p_aggro_aggro = 1.0 +- (0.0, 0.0) [1.0, 1.0]
+# p_pacif_aggro = 0.8625 +- (0.07500000000000007, 0.07499999999999996) [0.7875, 0.9375]
 
 
 
@@ -297,9 +295,6 @@ function create_transition_aggro_diff(df_0)
     lower = sort(boot_aggro_diff)[round(Int, n_b * 0.025)]
     upper = sort(boot_aggro_diff)[round(Int, n_b * 0.975)] 
     errors_aggro_diff = (p_aggro_diff - lower, upper - p_aggro_diff)
-
-
-
     println("p_aggro_aggro = $(p_aggro_diff) +- $(errors_aggro_diff)")
 
     return p_aggro_diff, errors_aggro_diff
@@ -307,7 +302,7 @@ end
 
 function run_crossmove_aggro_diff()
     labs = ["Humans", "GPT3.5", "GPT4.0", "Random"]
-    res_hum = create_transition_aggro_diff(df_real_feb24)
+    res_hum = create_transition_aggro_diff(df_real_aug24)
     res_gpt35 = create_transition_aggro_diff(df_gpt35_dialog3_fix)
     res_gpt4 = create_transition_aggro_diff(df_gpt4_dialog3_fix)
 
