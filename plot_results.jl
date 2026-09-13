@@ -44,10 +44,13 @@ groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="M
 
 # Humans
 
-n, y, g = compare_treatments_move1(df_real, ai_column_name, ai_accuracies)
+n, y, g = compare_treatments_move1(df_real_aug24, ai_column_name, ai_accuracies)
 groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="Move 1", dpi=300)
 # savefig("move1.png")
 
-n, y, g = compare_treatments_move2(df_real, china_column_name, china_treatments)
+n, y, g = compare_treatments_move1(df_real_aug24, train_column_name, train_quality)
+groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="Move 1", dpi=300)
+
+n, y, g = compare_treatments_move2(df_real_aug24, china_column_name, china_treatments)
 groupedbar(n, y, group=g, xrot=60, bottom_margin=15mm, ylabel="Counts", title="Move 2", dpi=300)
 # savefig("move2.png")

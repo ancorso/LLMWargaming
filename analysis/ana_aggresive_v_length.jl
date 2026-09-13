@@ -241,7 +241,7 @@ function make_plot_both()
 end
 
 make_plot_both()
-# savefig("both_moves_aggresivness_nactions_v_dialoglength_Aug24_fix.png")
-# savefig("both_moves_aggresivness_nactions_v_dialoglength_Aug24_fix.pdf")
+savefig("both_moves_aggresivness_nactions_v_dialoglength_Aug24_fix.png")
+savefig("both_moves_aggresivness_nactions_v_dialoglength_Aug24_fix.pdf")
 # savefig("both_moves_aggresivness_nactions_v_dialoglength_Feb24_fix.png")
 # savefig("both_moves_aggresivness_nactions_v_dialoglength_Feb24_fix.pdf")

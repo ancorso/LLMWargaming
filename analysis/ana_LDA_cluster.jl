@@ -256,3 +256,122 @@ savefig("lda_bothmoves_all5_Aug24.pdf")
 # create_pca_plot(df_gpt35_dialog3_fix, df_real_aug24, df_gpt4_dialog3_fix, "", ["GPT-3.5", "GPT-4", "Human"]; move=0, method=meth, add_random=true)
 # # savefig(meth * "_bothmoves_gpt3_v_human_v_gpt4_v_random_Aug24_fixed.png")
 # # savefig(meth * "_bothmoves_gpt3_v_human_v_gpt4_v_random_Aug24_fixed.pdf")
+
+function create_pca_plot_solo(df_0, tit, plot_labs; move=1, method="PCA", add_noise=true, add_random=false)
+
+    Random.seed!(SEED)
+
+    plot_title = "Move $(move): " * tit
+    if move == 1
+        short_options = move_1_2_options_shortdesc()
+        options = move_1_2_options_desc()
+    elseif move == 2
+        options = move_2_2_options_desc()
+        short_options = options
+
+        move_2_viol = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        move_2_ambi = [0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0]
+        move_2_nonv = [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1]
+    elseif move == 0
+        options = [move_1_2_options_desc()..., move_2_2_options_desc()...]
+        # plot_title = "Both Moves: " * tit
+        plot_title = tit
+    end
+
+    # Convert DataFrame columns to arrays and then to a matrix
+    res_0_mat = Matrix(df_0[:, options])
+    rescale(A; dims=1) = (A .- Statistics.mean(A, dims=dims)) ./ max.(std(A, dims=dims), eps())
+
+    if move == 2
+        is_viol2 = []
+        is_ambi2 = []
+        is_nonv2 = []
+        for (k, row_k) in enumerate(eachrow(res_0_mat))
+            # MULTIPLY WITH MASK HERE? Then check if sum is 1 or larger
+            vec2_k = Vector(row_k)
+            push!(is_viol2, sum(vec2_k .* move_2_viol) >= 1 ? 1 : 0)
+            push!(is_ambi2, sum(vec2_k .* move_2_ambi) >= 1 ? 1 : 0)
+            push!(is_nonv2, sum(vec2_k .* move_2_nonv) >= 1 ? 1 : 0)
+        end
+    end 
+
+    if add_random
+        # insert!(plot_labs, 3, "Random")
+        append!(plot_labs, ["Random"])
+        n_rand = size(res_0_mat)[1]
+
+        res_rand = [rand(0:1, size(res_0_mat)[2]) for _ in 1:n_rand]
+        res_rand = hcat(res_rand...)
+        rand_labels = ones(n_rand) * -1
+
+        res_tot = transpose(vcat(res_0_mat, transpose(res_rand)))
+        res_labels = [zeros(size(res_0_mat)[1])..., rand_labels...]
+
+    else 
+        res_tot = transpose(vcat(res_0_mat))
+        res_labels = [zeros(size(res_0_mat)[1])...]
+    end
+
+    res_tot = rescale(res_tot)
+
+    if method == "LDA"
+        # Do LDA
+        lda = fit(MulticlassLDA, res_tot, res_labels; outdim=2)
+        preds = predict(lda, res_tot)
+    elseif method == "PCA"
+        # Do PCA
+        m_pca = fit(PCA, res_tot; maxoutdim=2)
+        preds = predict(m_pca, res_tot)
+    elseif method == "tSNE"
+        # Do tSNE
+        preds = transpose(rescale(tsne(transpose(res_tot), 2)))
+    else
+        @error "Not implemented method $(method)"
+    end
+
+    if add_noise
+        preds = preds + 0.025 .* randn(size(preds))  
+    end
+
+    s = plot(
+        xlabel="Response Vector Projection Dim 1 [a.u.]",
+        ylabel="Response Vector Projection Dim 2 [a.u.]",
+        # xlims=[-0.82, 0.82],
+        title=plot_title,
+        legend=:topleft,
+    )
+
+    for (lab_i, lab) in enumerate(unique(res_labels))
+        data = transpose(preds[:, res_labels .== lab])
+        data_mean = calculate_mean(data)
+        covariance = calculate_covariance(data, data_mean)
+
+        if lab != -1.
+            plot_confidence_ellipse(data_mean, covariance, s, cols[lab]; primary=false)
+            scatter!(
+                preds[1, :][res_labels .== lab],
+                preds[2, :][res_labels .== lab],
+                # collect(1:length(options)),
+                # xerror=errors,
+                label=plot_labs[lab_i] * " Data (95% Conf.)",
+                color=cols[lab],
+                # markershapes=:xcross,
+                # markersize=4,
+                dpi=300,
+                # alpha=0.7
+            )
+        else
+            plot_confidence_ellipse(data_mean, covariance, s, cols[lab]; label="Random Data (95% Conf.)")
+        end
+
+    end
+
+    return s
+end
+create_pca_plot_solo(df_real_aug24, "", ["Human"]; move=2, method="PCA")
+
+
+
+create_pca_plot_solo(df_real_aug24, "", ["Human"]; move=1, method="PCA")
+create_pca_plot_solo(df_real_aug24, "", ["Human"]; move=2, method="PCA")
+create_pca_plot_solo(df_real_aug24, "", ["Human"]; move=0, method="PCA")
