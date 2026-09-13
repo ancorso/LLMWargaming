@@ -36,3 +36,5 @@ Manifest.toml
 .venv/
 __pycache__/
 *.zip
+
+dump.jl
