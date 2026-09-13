@@ -51,10 +51,11 @@ df_gpt4o_dialog3_fix = CSV.read("results/gpt4o/data_gpt4o_dialog3.csv", DataFram
 df_gpt4o_dialog4_fix = CSV.read("results/gpt4o/data_gpt4o_dialog4.csv", DataFrame)
 df_gpt4o_dialog5_fix = CSV.read("results/gpt4o/data_gpt4o_dialog5.csv", DataFrame)
 df_gpt4o_dialog6_fix = CSV.read("results/gpt4o/data_gpt4o_dialog6.csv", DataFrame)
-df_gpt4o_dialog3_noinstr = CSV.read("results/gpt4o/data_gpt4o_dialog3_noinstruct.csv", DataFrame)
 
 # LLM Data Without Presidential Instructions (Old Naming Convention)
-
+df_gpt4o_dialog3_noinstr = CSV.read("results/gpt4o/data_gpt4o_dialog3_noinstruct.csv", DataFrame)
+df_gpt35_dialog3_noinstr = CSV.read("results/sensitivity_studies/data_dialog3.csv", DataFrame)
+# df_gpt4_dialog3_noinstr = CSV.read("results/sensitivity_studies/data_dialog3.csv", DataFrame) "results/gpt4_turbo/data_dialog3.csv"?
 
 # Sensitivity Studies
 df_nochief = CSV.read("results/sensitivity_studies/data_nochiefs.csv", DataFrame)
@@ -64,3 +65,5 @@ df_sociopath = CSV.read("results/sensitivity_studies_new/data_sociopath.csv", Da
 df_more_disagreement = CSV.read("results/sensitivity_studies_new/data_moredisagree.csv", DataFrame)
 df_gpt4_pacifism = CSV.read("results/gpt4_turbo/data_pacifism.csv", DataFrame)
 df_gpt4_sociopath = CSV.read("results/gpt4_turbo/data_sociopaths.csv", DataFrame)
+df_gpt4o_pacifism = CSV.read("results/gpt4o/data_gpt4o_dialog3_pacifists.csv", DataFrame)
+df_gpt4o_sociopath = CSV.read("results/gpt4o/data_gpt4o_dialog3_sociopaths.csv", DataFrame)

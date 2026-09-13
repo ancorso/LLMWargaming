@@ -65,8 +65,9 @@ function create_boot_diff(df, tit, column_name, treatments; move=1, return_data=
     res_0 = df[df[!, column_name] .== treatments[1], options]
     res_1 = df[df[!, column_name] .== treatments[2], options]
     mus, errors = calc_comp(res_0, res_1, n_b)
-    println(mus)
-    println(errors)
+    for (lab_i, lab) in enumerate(short_options)
+        println(lab, " ", round(mus[lab_i], digits=3), " -", round(errors[lab_i][1], digits=3), "/+", round(errors[lab_i][2], digits=3))
+    end
 
     scatter!(
         mus,
@@ -100,8 +101,9 @@ function create_boot_diff(df_0, df_1, tit; move=1, return_data=false)
     res_0 = df_0[!, options]
     res_1 = df_1[!, options]
     mus, errors = calc_comp(res_0, res_1, n_b)
-    println(mus)
-    println(errors)
+    for (lab_i, lab) in enumerate(short_options)
+        println(lab, " ", mus[lab_i], " ", errors[lab_i])
+    end
 
     scatter!(
         mus,
@@ -164,8 +166,11 @@ end
 
 # Treatment Analysis (Take Difference Between Treatments, Not Data Types)
 create_boot_diff(df_real_aug24, "Human Data", ai_column_name, ai_accuracies)
+savefig("treatment_effect_ai_acc.png")
 create_boot_diff(df_real_aug24, "Human Data", train_column_name, train_quality)
+savefig("treatment_effect_ai_train.png")
 create_boot_diff(df_real_aug24, "Human Data", china_column_name, china_treatments; move=2)
+savefig("treatment_effect_china_posture.png")
 
 create_boot_diff(df_gpt35_dialog3_fix, "GPT-3.5 (Dialog 3)", ai_column_name, ai_accuracies)
 create_boot_diff(df_gpt35_dialog3_fix, "GPT-3.5 (Dialog 3)", train_column_name, train_quality)
@@ -182,6 +187,12 @@ create_boot_diff(df_gpt4o_dialog3_fix, "GPT-4o (Dialog 3)", china_column_name, c
 # Comparing LLMs Directly
 create_boot_diff(df_gpt35_dialog3_fix, df_gpt4_dialog3_fix, "GPT3.5 Fix - GPT4 Fix")
 create_boot_diff(df_gpt35_dialog3_fix, df_gpt4_dialog3_fix, "GPT3.5 Fix - GPT4 Fix"; move=2)
+
+create_boot_diff(df_gpt35_dialog3_fix, df_gpt4o_dialog3_fix, "GPT3.5 Fix - GPT4o Fix")
+create_boot_diff(df_gpt35_dialog3_fix, df_gpt4o_dialog3_fix, "GPT3.5 Fix - GPT4o Fix"; move=2)
+
+create_boot_diff(df_gpt4_dialog3_fix, df_gpt4o_dialog3_fix, "GPT4 Fix - GPT4o Fix")
+create_boot_diff(df_gpt4_dialog3_fix, df_gpt4o_dialog3_fix, "GPT4 Fix - GPT4o Fix"; move=2)
 
 # Comparing LLMs to Humans
 create_boot_diff(df_gpt35_dialog3_fix, df_real_aug24, "GPT3.5 Fix - Human Data")
@@ -209,12 +220,15 @@ create_boot_diff(df_gpt4_dialog3, df_gpt4_dialogno, "Dialog3 - no Dialog"; move=
 create_boot_diff(df_gpt4_pacifism, df_gpt4_sociopath, "Pacifism - Sociopath")
 create_boot_diff(df_gpt4_pacifism, df_gpt4_sociopath, "Pacifism - Sociopath"; move=2)
 
-# Impact of Instructions
-create_boot_diff(df_gpt4_dialog3, df_gpt4_dialog3_fix, "GPT4 - GPT4 Fix")
-create_boot_diff(df_gpt4_dialog3, df_gpt4_dialog3_fix, "GPT4 - GPT4 Fix"; move=2)
+create_boot_diff(df_gpt4o_pacifism, df_gpt4o_sociopath, "Pacifism - Sociopath")
+create_boot_diff(df_gpt4o_pacifism, df_gpt4o_sociopath, "Pacifism - Sociopath"; move=2)
 
-create_boot_diff(df_dialog3, df_gpt35_dialog3_fix, "GPT3 - GPT3 Fix")
-create_boot_diff(df_dialog3, df_gpt35_dialog3_fix, "GPT3 - GPT3 Fix"; move=2)
+# Impact of Instructions
+create_boot_diff(df_gpt4_dialog3_noinstr, df_gpt4_dialog3_fix, "GPT4 - GPT4 Fix")
+create_boot_diff(df_gpt4_dialog3_noinstr, df_gpt4_dialog3_fix, "GPT4 - GPT4 Fix"; move=2)
+
+create_boot_diff(df_gpt35_dialog3_noinstr, df_gpt35_dialog3_fix, "GPT3 - GPT3 Fix")
+create_boot_diff(df_gpt35_dialog3_noinstr, df_gpt35_dialog3_fix, "GPT3 - GPT3 Fix"; move=2)
 
 create_boot_diff(df_gpt4o_dialog3_noinstr, df_gpt4o_dialog3_fix, "GPT4o No Inst - GPT4o")
 create_boot_diff(df_gpt4o_dialog3_noinstr, df_gpt4o_dialog3_fix, "GPT4o No Inst - GPT4o"; move=2)
@@ -224,7 +238,7 @@ function def_plot_selected(opts, tit)
         # yticks=(1:length(opts), opts),
         # ylims=[0.5, length(opts) + 1],
         # yticks=([1, 2, 3, 4, 5, 7, 8, 9], opts),
-        yticks=([1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13], opts),
+        yticks=([1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14], opts),
         ylims=[0.5, length(opts) + 2 - 0.1],
         # xrot=60,
         # bottom_margin=15mm,
@@ -234,9 +248,11 @@ function def_plot_selected(opts, tit)
         title=tit,
         legend=:bottomleft,
         # legend=:topright,
+        size=(600, 620),
+        grid=false,
     )
     # vline!([0], lw=2, linestyle=:dash, linecolor="#100B00", label=nothing)
-    plot!([0., 0], [0., 13.9], lw=1.5, linestyle=:dash, linecolor="#100B00", label=nothing)
+    plot!([0., 0], [0., 15.9], lw=1.5, linestyle=:dash, linecolor="#100B00", label=nothing)
     # vspan!([[0., 0.], [0.1, 8.]], lw=2, linestyle=:dash, linecolor="#100B00", label=nothing)
     # vspan!([[0., 0.], [0.1, 8.]], label=nothing)
     return s
@@ -248,7 +264,7 @@ function create_boot_diff_selected(df_0, df_1, df_2; return_data=false)
     # [a, b, c, d, e, f, g]
     short_options = move_1_2_options_shortdesc()[[1, 2, 4, 5]]
     options = move_1_2_options_desc()[[1, 2, 4, 5]]
-    short_options[1] = "(a) 'Fire at vessels'"
+    short_options[1] =  "(a) 'Fire at vessels'"
 
     # short_options = [s[1:4] * "'" * s[5:length(s)] * "'" for s in short_options]
 
@@ -319,18 +335,23 @@ function create_boot_diff_selected(df_0, df_1, df_2, df_3; return_data=false)
     # [a, b, c, d, e, f, g]
     short_options = move_1_2_options_shortdesc()[[1, 2, 4, 5]]
     options = move_1_2_options_desc()[[1, 2, 4, 5]]
-    # short_options[1] = "(a) 'Fire at vessels'"
-
+    len_m_one = length(short_options)
     # short_options = [s[1:4] * "'" * s[5:length(s)] * "'" for s in short_options]
 
     # [2, 5, 6, 9, 12, 13, 14]
     # old [5, 6, 9, 13, 14]
     # [a, a1, a2, a3, b, c, d, e, f, g, h, i, j, k]
-    append!(options, move_2_2_options_desc()[[2, 4, 5, 6, 9, 12, 13, 14]])
-    append!(short_options, move_2_2_options_desc()[[2, 4, 5, 6, 9, 12, 13, 14]])
-
+    append!(options, move_2_2_options_desc()[[2, 4, 5, 6, 10, 11, 12, 13, 14]])
+    append!(short_options, move_2_2_options_desc()[[2, 4, 5, 6, 10, 11, 12, 13, 14]])
+    
+    short_options[1] = "(a) Fire at opposing vessels"
     # short_options[4] = "MOVE 2: " * short_options[4]
     short_options = [s[1:4] * "'" * s[5:length(s)] * "'" for s in short_options]
+    old_str = short_options[len_m_one+ 1]
+    short_options[len_m_one + 1] = "(a1)" * old_str[4:lastindex(old_str)]
+    old_str = short_options[len_m_one + 2]
+    short_options[len_m_one + 2] = "(a3)" * old_str[4:lastindex(old_str)]
+
     
     n_b = 10000
     fig = def_plot_selected(reverse(short_options), "")
@@ -353,7 +374,7 @@ function create_boot_diff_selected(df_0, df_1, df_2, df_3; return_data=false)
 
     scatter!(
         mus,
-        collect(1:length(options)) .- 0.105 .+ [0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+        collect(1:length(options)) .- 0.105 .+ [0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
         xerror=errors,
         label="GPT-3.5 (95% Conf.)",
         color=cols[1],
@@ -361,7 +382,7 @@ function create_boot_diff_selected(df_0, df_1, df_2, df_3; return_data=false)
     )
     scatter!(
         mus2,
-        collect(1:length(options)) .+ 0.0 .+ [0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+        collect(1:length(options)) .+ 0.0 .+ [0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
         xerror=errors2,
         label="GPT-4 (95% Conf.)",
         color=cols[2],
@@ -369,25 +390,26 @@ function create_boot_diff_selected(df_0, df_1, df_2, df_3; return_data=false)
     )
     scatter!(
         mus3,
-        collect(1:length(options)) .+ 0.105 .+ [0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
+        collect(1:length(options)) .+ 0.105 .+ [0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1.],
         xerror=errors3,
         label="GPT-4o (95% Conf.)",
         color=cols[3],
         dpi=300,
+        grid=false,
     )
     # annotate!(0., 11., text("mytext", :red, :right, 3))
     annotate!(0.025, length(options) + 1. + 0.7, ("More Counts Than Humans", :left, 8))
     annotate!(-0.425, length(options) + 1. + 0.7, ("Fewer Counts", :left, 8))
     # annotate!(0.025, length(options) + 1. + 0.7, "Same Counts as Humans", :left)
     # hline!([6.], lw=3, linecolor="#100B00", label=nothing)
-    hline!([9. + 1. / 3.], lw=3, linecolor="#100B00", label=nothing)
+    hline!([10. + 1. / 3.], lw=3, linecolor="#100B00", label=nothing)
 
     # annotate!(-2., length(options) + 2. - 0.25, text("Move 1", :left, :bold, 10))
     # annotate!(-2., 5.75, text("Move 2", :left, :bold, 10))
     # annotate!(-2.0, length(options) + 2. - 0.25, "Move 1: Use AI Weapon?", :left)
     # annotate!(-2., 5.75, "Move 2: China Status", :left)
     annotate!(-2.15, length(options) + 2. - 0.25, ("Move 1: Use New AI Weapon?", :left, 11))
-    annotate!(-2.05, 8.75, ("Move 2: Opponent Posture", :left, 11))
+    annotate!(-2.05, 9.75, ("Move 2: Opponent Posture", :left, 11))
 
     if return_data
         return short_options, mus, errors
@@ -406,3 +428,6 @@ end
 # # savefig("selected_gpt3_gpt4_v_humans_Aug24_fix_nochina.pdf")
 
 create_boot_diff_selected(df_real_aug24, df_gpt35_dialog3_fix, df_gpt4_dialog3_fix, df_gpt4o_dialog3_fix)
+# savefig("selected_all4_Aug24.pdf")
+# savefig("selected_all4_Aug24.png")
+# savefig("selected_all4_Aug24_nochina.png")

@@ -7,15 +7,14 @@ using CSV
 using Serialization
 using ProgressBars
 
-
-# TODO set and variate text generation length? --> kinda covered with dialog steps. should be irrelevant
 # TODO Number of teams and players does not affect bench data --> should also cut it?
 # TODO Add sanity check (at least one action taken and add invalid flag?) --> do in data analysis
 
 # Everything not set will result in usage of default values 
 conf = init_sim_conf(
     # model="gpt-4-1106-preview",
-    model="gpt-3.5-turbo-16k",
+    # model="gpt-3.5-turbo-16k",
+    model="gpt-4o",
     # secret_key=get(ENV, "OPENAI_API_KEY", ""),
     # wargame_dir="wargame/",
     # output_dir="results/",
@@ -25,7 +24,7 @@ conf = init_sim_conf(
     no_dialog=false,
     no_chiefs=false,
     boostrap_players=true,
-    pacificsm=false,
+    pacificsm=true,
     sociopaths=false,
     more_disagreement=false,
     verbose=false,
@@ -115,3 +114,28 @@ end
 # run_simulation(SimulationConfig())
 # run_simulation(SimulationConfig(run_test_game=true, verbose=true, use_dummygpt=true))
 run_simulation(conf)
+
+conf2 = init_sim_conf(
+    # model="gpt-4-1106-preview",
+    # model="gpt-3.5-turbo-16k",
+    model="gpt-4o",
+    # secret_key=get(ENV, "OPENAI_API_KEY", ""),
+    # wargame_dir="wargame/",
+    # output_dir="results/",
+    # out_csv_file="",
+    use_dummygpt=true,
+    use_bench_players=true,
+    no_dialog=false,
+    no_chiefs=false,
+    boostrap_players=true,
+    pacificsm=false,
+    sociopaths=true,
+    more_disagreement=false,
+    verbose=false,
+    # save_results_to_csv=true,
+    run_test_game=true,
+    n_teams=10,
+    n_players=6,
+    n_dialog_steps=3,
+)
+run_simulation(conf2)

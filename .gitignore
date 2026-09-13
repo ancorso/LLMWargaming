@@ -30,3 +30,9 @@ Manifest.toml
 *.png
 *.pdf
 *.numbers
+*.txt
+*.pkl
+
+.venv/
+__pycache__/
+*.zip
